@@ -12,7 +12,7 @@ Good luck!
 
 `AZURE_TENANT_ID=967a4bc4-782a-492d-a5d5-afe8a7550b5f
 AZURE_CLIENT_SECRET=yx68Q~II4GTgTEyh1NyDxBh73X0YZwQhxWDdfaIc
-AZURE_CLIENT_ID=f83cb3d7-47de-4154-be65-c85d697cdfd3`
+AZURE_CLIENT_ID=f83cb3d7-47de-4154-be65-c85d697cdfd3redacted`
 
 ` echo $WEB_APP_ENDPOINT
 https://app-admin-dpbug0fqb4gea3a6.z01.azurefd.net/`
@@ -72,12 +72,12 @@ In Azure AD (Entra ID), multi-tenant applications can be authorized in any tenan
 
 **Approach:**
 
-- Use the victim tenant’s ID: `d26f353d-c564-48e7-b26f-aa48c6eecd58`
-- Use the client ID of our malicious OAuth app: `f83cb3d7-47de-4154-be65-c85d697cdfd3`
+- Use the victim tenant’s ID: `d26f353d-c564-48e7-b26f-redacted`
+- Use the client ID of our malicious OAuth app: `f83cb3d7-47de-4154-be65-c85d697cdfd3redacted`
 - Construct the admin consent URL in the following format:
 
 ```
-https://login.microsoftonline.com/d26f353d-c564-48e7-b26f-aa48c6eecd58/adminconsent?client_id=f83cb3d7-47de-4154-be65-c85d697cdfd3
+https://login.microsoftonline.com/d26f353d-c564-48e7-b26f-aa48c6eecd58/adminconsent?client_id=f83cb3d7-47de-4154-be65-c85d697cdfd3redacted
 ```
 
 By visiting this URL while authenticated as an admin in the victim tenant, you can attempt to grant consent to your malicious application, potentially bypassing the imposed restrictions.
