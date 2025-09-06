@@ -10,10 +10,6 @@ The shell environment has been preloaded with your malicious OAuth app credentia
 
 Good luck! 
 
-`AZURE_TENANT_ID=REDACTED_TENANT_ID
-AZURE_CLIENT_SECRET=REDACTED_CLIENT_SECRET
-AZURE_CLIENT_ID=REDACTED_CLIENT_ID`
-
 ` echo $WEB_APP_ENDPOINT
 https://app-admin-dpbug0fqb4gea3a6.z01.azurefd.net/`
 
@@ -323,10 +319,3 @@ az storage blob download \
 Reveal the flag: `cat ctf_flag.txt`
 
 ![wiz15](assets/img/wizctf15.png)
-
-
-
-
-
-
-WIZ_CTF{EntraID_Sensitive_Privileges_Breaking_Barriers}
