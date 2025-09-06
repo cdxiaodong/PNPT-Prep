@@ -10,9 +10,9 @@ The shell environment has been preloaded with your malicious OAuth app credentia
 
 Good luck! 
 
-`AZURE_TENANT_ID=967a4bc4-782a-492d-a5d5-afe8a7550b5f
-AZURE_CLIENT_SECRET=yx68Q~II4GTgTEyh1NyDxBh73X0YZwQhxWDdfaIc
-AZURE_CLIENT_ID=f83cb3d7-47de-4154-be65-c85d697cdfd3redacted`
+`AZURE_TENANT_ID=REDACTED_TENANT_ID
+AZURE_CLIENT_SECRET=REDACTED_CLIENT_SECRET
+AZURE_CLIENT_ID=REDACTED_CLIENT_ID`
 
 ` echo $WEB_APP_ENDPOINT
 https://app-admin-dpbug0fqb4gea3a6.z01.azurefd.net/`
@@ -53,10 +53,10 @@ curl -s https://login.microsoftonline.com/azurectfchallengegame.com/v2.0/.well-k
   | jq -r .issuer
 ```
 
-Here we have the tenant ID: `d26f353d-c564-48e7-b26f-aa48c6eecd58`
+Here we have the tenant ID: `REDACTED_TENANT_ID`
 
 ```bash
-export VICTIM_TENANT_ID=d26f353d-c564-48e7-b26f-aa48c6eecd58
+export VICTIM_TENANT_ID=REDACTED_TENANT_ID
 ```
 
 Alternatively, we could have used [whatismytenantid.com](https://whatismytenantid.com).
@@ -72,12 +72,12 @@ In Azure AD (Entra ID), multi-tenant applications can be authorized in any tenan
 
 **Approach:**
 
-- Use the victim tenant’s ID: `d26f353d-c564-48e7-b26f-redacted`
-- Use the client ID of our malicious OAuth app: `f83cb3d7-47de-4154-be65-c85d697cdfd3redacted`
+- Use the victim tenant’s ID: `REDACTED_TENANT_ID`
+- Use the client ID of our malicious OAuth app: `REDACTED_CLIENT_ID`
 - Construct the admin consent URL in the following format:
 
 ```
-https://login.microsoftonline.com/d26f353d-c564-48e7-b26f-aa48c6eecd58/adminconsent?client_id=f83cb3d7-47de-4154-be65-c85d697cdfd3redacted
+https://login.microsoftonline.com/REDACTED_TENANT_ID/adminconsent?client_id=REDACTED_CLIENT_ID
 ```
 
 By visiting this URL while authenticated as an admin in the victim tenant, you can attempt to grant consent to your malicious application, potentially bypassing the imposed restrictions.
@@ -96,7 +96,7 @@ The process prompted us to set up Multi-Factor Authentication (MFA) for the acco
 
 ![wiz6](assets/img/wizctf6.png)
 
-Giving consent redirects us to the [Wiz blog](https://www.wiz.io/blog/midnight-blizzard-microsoft-breach-analysis-and-best-practices?admin_consent=True&tenant=d26f353d-c564-48e7-b26f-aa48c6eecd58#) of `Midnight Blizzard ` attack on Microsoft corp environment. 
+Giving consent redirects us to the [Wiz blog](https://www.wiz.io/blog/midnight-blizzard-microsoft-breach-analysis-and-best-practices?admin_consent=True&tenant=REDACTED_TENANT_ID#) of `Midnight Blizzard ` attack on Microsoft corp environment. 
 
 This redirect serves as a clear indicator in the context of the challenge: it confirms that our malicious multi-tenant application has been successfully granted admin consent within the victim tenant. With this confirmation, the app is now authorized and can operate with the permissions assigned in the target environment.
 
