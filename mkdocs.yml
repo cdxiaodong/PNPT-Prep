@@ -23,6 +23,8 @@ nav:
                - ghostcat.md
                - convert.md
                - whiterabbit.md
+            - Wiz CTF:
+               - breaking the barriers.md
     - OpSec:
         - OpSec.md
 
