@@ -1,0 +1,4 @@
+literal:yx68Q~II4GTgTEyh1NyDxBh73X0YZwQhxWDdfaIc==>REDACTED_CLIENT_SECRET
+literal:f83cb3d7-47de-4154-be65-c85d697cdfd3==>REDACTED_CLIENT_ID
+literal:967a4bc4-782a-492d-a5d5-afe8a7550b5f==>REDACTED_TENANT_ID
+literal:WIZ_CTF{EntraID_Sensitive_Privileges_Breaking_Barriers}==>WIZ_CTF{REDACTED}

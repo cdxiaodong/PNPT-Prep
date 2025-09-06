@@ -1,8 +1,8 @@
 # Wiz Cloud Security Championship
 
-Azure and OAuth-focused challenge:
+Azure and Oauth focused challange:
 
-[Useful links to OAuth](https://darutk.medium.com/diagrams-and-movies-of-all-the-oauth-2-0-flows-194f3c3ade85)
+[Usefull links to Oauth](https://darutk.medium.com/diagrams-and-movies-of-all-the-oauth-2-0-flows-194f3c3ade85)
 
  As an APT group targeting Azure, you've discovered a web app that creates admin users, but they are heavily restricted. To gain initial access, you've created a malicious OAuth app in your tenant and now seek to deploy it into the victim's tenant. Can you bypass the restrictions and capture the flag?
 
@@ -10,22 +10,26 @@ The shell environment has been preloaded with your malicious OAuth app credentia
 
 Good luck! 
 
+`AZURE_TENANT_ID=967a4bc4-782a-492d-a5d5-afe8a7550b5f
+AZURE_CLIENT_SECRET=yx68Q~II4GTgTEyh1NyDxBh73X0YZwQhxWDdfaIc
+AZURE_CLIENT_ID=f83cb3d7-47de-4154-be65-c85d697cdfd3`
+
 ` echo $WEB_APP_ENDPOINT
 https://app-admin-dpbug0fqb4gea3a6.z01.azurefd.net/`
 
 **Explanations:**
-- **AZURE_TENANT_ID**: The unique identifier for the Azure Active Directory tenant. It specifies which Azure directory your app (malicious OAuth) is associated with.
+- **AZURE_TENANT_ID**: The unique identifier for the Azure Active Directory tenant. It specifies which Azure directory your app ( malicious OAuth) is associated with.
 - **AZURE_CLIENT_ID**: The application (client) ID registered in Azure AD. Used to identify your OAuth app.
 - **AZURE_CLIENT_SECRET**: The secret key for your OAuth app, used for authentication when requesting tokens.
 - **WEB_APP_ENDPOINT**: The URL of the target web application you are attacking or testing.
 
-This is our front door: `https://app-admin-dpbug0fqb4gea3a6.z01.azurefd.net`
+This is our front door `https://app-admin-dpbug0fqb4gea3a6.z01.azurefd.net` 
 
-Create user and check network action:
+Create user and check networtk action:
 
 ![wiz](assets/img/wizctf1.png)
 
-User created as Global Admin:
+User Created as Global Admin:
 `sleheehunter665@azurectfchallengegame.com`
 
 
@@ -42,20 +46,16 @@ Once an admin account is created through the web app (despite its restrictions),
 
 This domain provides a clue about the victim tenant we are targeting for further exploitation.
 
-We need to find the tenant ID in order to build the admin consent URL for the malicious app:
+Need to find out the tenant ID in order to build the URL to allow and give consent to the maliciouse App:
 
-```bash
-curl -s https://login.microsoftonline.com/azurectfchallengegame.com/v2.0/.well-known/openid-configuration \
-  | jq -r .issuer
-```
+`curl -s https://login.microsoftonline.com/azurectfchallengegame.com/v2.0/.well-known/openid-configuration \
+| jq -r .issuer`
 
-Here we have the tenant ID: `REDACTED_TENANT_ID`
+Here we have the tenant ID: `d26f353d-c564-48e7-b26f-aa48c6eecd58`
 
-```bash
-export VICTIM_TENANT_ID=REDACTED_TENANT_ID
-```
+`export VICTIM_TENANT_ID=d26f353d-c564-48e7-b26f-aa48c6eecd58` to save for easier use later.
 
-Alternatively, we could have used [whatismytenantid.com](https://whatismytenantid.com).
+Alternativly we could of used [whatsmytenantid.com](whatismytenantid.com.)
 
 ![wiz2](assets/img/wizctf2.png)
 
@@ -68,12 +68,12 @@ In Azure AD (Entra ID), multi-tenant applications can be authorized in any tenan
 
 **Approach:**
 
-- Use the victim tenant’s ID: `REDACTED_TENANT_ID`
-- Use the client ID of our malicious OAuth app: `REDACTED_CLIENT_ID`
+- Use the victim tenant’s ID: `d26f353d-c564-48e7-b26f-aa48c6eecd58`
+- Use the client ID of our malicious OAuth app: `f83cb3d7-47de-4154-be65-c85d697cdfd3`
 - Construct the admin consent URL in the following format:
 
 ```
-https://login.microsoftonline.com/REDACTED_TENANT_ID/adminconsent?client_id=REDACTED_CLIENT_ID
+https://login.microsoftonline.com/d26f353d-c564-48e7-b26f-aa48c6eecd58/adminconsent?client_id=f83cb3d7-47de-4154-be65-c85d697cdfd3
 ```
 
 By visiting this URL while authenticated as an admin in the victim tenant, you can attempt to grant consent to your malicious application, potentially bypassing the imposed restrictions.
@@ -92,7 +92,7 @@ The process prompted us to set up Multi-Factor Authentication (MFA) for the acco
 
 ![wiz6](assets/img/wizctf6.png)
 
-Giving consent redirects us to the [Wiz blog](https://www.wiz.io/blog/midnight-blizzard-microsoft-breach-analysis-and-best-practices?admin_consent=True&tenant=REDACTED_TENANT_ID#) of `Midnight Blizzard ` attack on Microsoft corp environment. 
+Giving consent redirects us to the [Wiz blog](https://www.wiz.io/blog/midnight-blizzard-microsoft-breach-analysis-and-best-practices?admin_consent=True&tenant=d26f353d-c564-48e7-b26f-aa48c6eecd58#) of `Midnight Blizzard ` attack on Microsoft corp environment. 
 
 This redirect serves as a clear indicator in the context of the challenge: it confirms that our malicious multi-tenant application has been successfully granted admin consent within the victim tenant. With this confirmation, the app is now authorized and can operate with the permissions assigned in the target environment.
 
@@ -127,14 +127,14 @@ az login --service-principal \
 - `--allow-no-subscriptions`: Allows login even if the service principal has no active Azure subscriptions (useful in CTFs or restricted environments).
 
 
-This tells Azure: "Authenticate me as this app (service principal) in the victim tenant."
+This tells Azure: “Authenticate me as this app (service principal) in the victim tenant.”
 
 Once this succeeds, your CLI session now has a valid identity inside the victim tenant, not your attacker tenant.
 
-But this login only sets up your session; it doesn't automatically give you a usable ticket for the Microsoft Graph API.
+But this login only sets up your session; it doesn’t automatically give you a usable “ticket” for Graph API.
 
 
-```bash
+``` bash
 az account get-access-token \
   --resource https://graph.microsoft.com \
   --query accessToken -o tsv \
@@ -155,7 +155,7 @@ With the token, we can act as that app inside the victim tenant, bypassing the r
 
 So the token is the bridge:
 
-Without it → we're just outsiders.
+Without it → we’re just outsiders.
 
 With it → we become a trusted app inside the victim tenant, able to enumerate groups, invite users, and eventually uncover the flag.
 
@@ -304,7 +304,7 @@ az account show
 
 Downloading the Blob via Azure CLI
 
-Using the guest account session, download the flag:
+Using the guest account session, downlaod teh flag:
 
 ```bash
 
@@ -316,6 +316,6 @@ az storage blob download \
   --auth-mode login
 
 ```
-Reveal the flag: `cat ctf_flag.txt`
+Reveal teh flag: `cat ctf_flag.txt`
 
 ![wiz15](assets/img/wizctf15.png)
