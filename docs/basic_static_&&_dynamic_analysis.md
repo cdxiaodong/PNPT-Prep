@@ -243,7 +243,6 @@ This flow demonstrates how the malware uses network connectivity as a trigger fo
   - Delete itself from disk
   - Do not execute further
 
-# Basic Dynamic Analysis: `rat.unknown.exe.mals`
 
 This section documents the analysis of the new sample, `rat.unknown.exe.mals`, located in the Basic Dynamic Analysis directory. The IR team suspects command execution capability and requests identification of network and host-based signatures, as well as any other notable findings.
 
