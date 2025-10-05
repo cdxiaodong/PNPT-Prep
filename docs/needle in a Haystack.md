@@ -346,7 +346,7 @@ Notes:
 - The flag was exposed by the internal knowledge-base chatbot in response to sequential prompts that searched the workspace for files containing "FLAG". The assistant initially returned a redaction header ("🔐 Sensitive Information Detected") followed by the credential/flag content.
   Evidence (raw network captures and console output) should be kept in private engagement notes and redacted from any public reports.
 
-
+Guide Read [Wiz Research Uncovers Critical Vulnerability in AI Vibe Coding platform ](https://www.wiz.io/blog/critical-vulnerability-base44)
 
 
 
