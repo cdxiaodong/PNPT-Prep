@@ -38,6 +38,8 @@ In this lab, we revisit the dropper sample from earlier in the course to perform
 
 **Tool:** Cutter 
 
+Cutter is a free, open-source, Qt-based graphical frontend for low-level reverse-engineering frameworks (radare2/rizin). It packages disassembly, graph view, a built-in decompiler, hex/strings viewers, and debugging integration into a single GUI. Cutter makes it easier to explore functions, follow control flow, inspect cross-references, and run light interactive debugging — which is why it's ideal for this advanced static/dynamic analysis lab.
+
 ### 1. Opening the Sample in Cutter
 
 - Launch Cutter and open the sample (`dropper.downloadfromurl.exe.mals`).
@@ -139,6 +141,9 @@ Think of memory registers like the read head of a VCR tape: as data streams by, 
 - **ESP**: Stack pointer (tracks the top of the stack)
 - **EBP**: Base pointer (marks the start of the current stack frame)
 - **EIP**: Instruction pointer (points to the next instruction to execute)
+- **ESI**: Source index (commonly used as a source pointer for string/array operations)
+- **EDI**: Destination index (commonly used as a destination pointer for string/array operations)
+
 
 At any time, these registers hold addresses, values, or pointers that facilitate the interaction between CPU instructions and the stack. They are essential for moving data, controlling program flow, and managing function calls.
 
@@ -149,3 +154,42 @@ At any time, these registers hold addresses, values, or pointers that facilitate
 Learning assembly and low-level execution is all about building pattern recognition. The more you work with these concepts, the more familiar the patterns become—making it easier to analyze and understand new binaries in the future.
 
 ---
+
+### Reading a real main() prologue and a simple API call (cleaned explanation)
+
+The assembly that comes out of a compiler can look cryptic at first, especially if you don't write C regularly. A few practical conventions appear everywhere — once you know them, the code becomes much easier to follow.
+
+- argc / argv: In C the program's `main` function is commonly declared as `int main(int argc, char **argv)`. `argc` is the argument count (how many strings were passed on the command line). `argv` is an array of pointers to the argument strings themselves. If a program expects `source` and `destination` arguments, `argc` would be 2 and `argv` would point to those two strings. When you see these in assembly, they are simply values passed into `main` by the runtime.
+
+- Function prologue: Almost every non-leaf function starts with the same setup: `push ebp`; `mov ebp, esp`. This sequence saves the caller's base pointer on the stack and sets the current base pointer to the current stack pointer — establishing a stable stack frame for local variables and arguments. Seeing this pattern tells you: “we're in a function and local variables/arguments will be referenced relative to `ebp`.”
+
+- Using the stack for arguments (LIFO): On x86 with the stdcall/cdecl-style calling conventions, arguments are pushed onto the stack in reverse order (last argument pushed first). Because the stack is LIFO (last-in, first-out), the callee reads arguments in the correct order from its stack frame. When you see `push 0`, `push 0`, `push 0`, `push 0`, `push offset userAgentString` followed by `call ds:InternetOpenW`, you can map the pushed values to the documented parameters of `InternetOpenW` — user-agent, access type, proxy, proxy-bypass, flags — and verify the amount and order of arguments match the API's signature.
+
+- Matching pushes to an API: A helpful trick is to count pushes immediately before a `call` and compare them to the documented number of parameters for that API. If they match and one of the pushed values is a pointer to a readable string (like `"Mozilla/5.0"`), you can be confident how the parameters line up.
+
+- Return values and conditional flow: Many Windows API calls return status values in `EAX`. A common pattern is `test eax, eax` (or `cmp eax, 0`) followed by a conditional jump such as `jne` (jump if not equal) or `jz`/`jnz`. This is how the program checks success or failure and branches accordingly (e.g., execute the downloaded file vs. self-delete).
+
+- Stepping into deeper functions: Cutter lets you step into a called function (double-click the target or use the debugger). If the called function dives into more complexity than you need for a high-level understanding, you can note its purpose (for example: construct file path or perform logging) and continue analyzing the main flow. Save deeper dives for when you need to confirm specifics.
+
+This concrete pattern — function prologue, pushes for API params (in reverse order), `call`, then `test eax; jne` — is very common in networked droppers. Once you know to look for it, you'll spot download-and-execute logic quickly.
+
+---
+
+![x86](assets/img/intarg.png)
+
+![x86](assets/img/intarg2.png)
+
+### Advanced Dynamic Analysis: Debugging Malware 
+
+![x86](assets/img/debuger.png)
+
+Summary: A debugger sits between the running program and the OS, giving you precise control over each instruction the program executes. Unlike double-clicking a program to run it normally, a debugger lets you pause at the entry point, watch register and stack state (EIP, EAX, ESP, etc.), set breakpoints, and step through code instruction-by-instruction. Common controls are:
+
+- F9 — Run (resume execution until the next breakpoint or the program exits)
+- F8 — Step over (execute a call instruction without descending into it)
+- F7 — Step into (descend into a called function and trace its instructions)
+- F2 — Toggle breakpoint (pause execution when EIP reaches this instruction)
+
+Keep in mind the debugger is mostly a one-way tool: you can advance forward and restart to return to earlier points, but you generally cannot step backwards through executed instructions. Use breakpoints and stepping selectively to map program behavior while watching registers, the stack, and memory for changes.
+
+Practical debugging workflow: the point of using a debugger is to find the most interesting calling points (for example: networking, file I/O, process creation, or suspicious API calls), set breakpoints at those instructions, and then step into them to inspect arguments, return values, and side effects. Typical targets for breakpoints in droppers include `InternetOpen[AW]`, `URLDownloadToFile[AW]`, `CreateProcess`, `DeleteFile`, and functions that construct file paths or change persistence. This focused approach helps you get to the meaningful behavior quickly without stepping through every low-level instruction.
