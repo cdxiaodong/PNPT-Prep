@@ -183,7 +183,7 @@ This concrete pattern — function prologue, pushes for API params (in reverse o
 
 ![x86](assets/img/debuger.png)
 
-Summary: A debugger sits between the running program and the OS, giving you precise control over each instruction the program executes. Unlike double-clicking a program to run it normally, a debugger lets you pause at the entry point, watch register and stack state (EIP, EAX, ESP, etc.), set breakpoints, and step through code instruction-by-instruction. Common controls are:
+ A debugger sits between the running program and the OS, giving you precise control over each instruction the program executes. Unlike double-clicking a program to run it normally, a debugger lets you pause at the entry point, watch register and stack state (EIP, EAX, ESP, etc.), set breakpoints, and step through code instruction-by-instruction. Common controls are:
 
 - F9 — Run (resume execution until the next breakpoint or the program exits)
 - F8 — Step over (execute a call instruction without descending into it)
