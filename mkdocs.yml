@@ -11,7 +11,7 @@ nav:
     - PMAT:
         - Basic Static & Dynamic Analysis:
             - basic_static_&&_dynamic_analysis.md
-            - addvanced_dynamic_analysis.md
+            - addvanced_static_&&_dynamic_analysis.md
             - Tool_List_&_Resources.md
 
     - PrivEsc:
