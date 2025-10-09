@@ -29,6 +29,7 @@ nav:
                - needle in a Haystack.md
     - OpSec:
         - OpSec.md
+        - Critical CVE.md
 
 theme:
     name: material
