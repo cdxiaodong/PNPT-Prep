@@ -13,7 +13,7 @@ nav:
             - basic_static_&&_dynamic_analysis.md
             - addvanced_static_&&_dynamic_analysis.md
             - Tool_List_&_Resources.md
-
+            - wannacry.md
     - PrivEsc:
         - Linux: 
             - linux.md

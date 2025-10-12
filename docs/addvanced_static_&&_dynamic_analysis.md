@@ -193,3 +193,72 @@ This concrete pattern — function prologue, pushes for API params (in reverse o
 Keep in mind the debugger is mostly a one-way tool: you can advance forward and restart to return to earlier points, but you generally cannot step backwards through executed instructions. Use breakpoints and stepping selectively to map program behavior while watching registers, the stack, and memory for changes.
 
 Practical debugging workflow: the point of using a debugger is to find the most interesting calling points (for example: networking, file I/O, process creation, or suspicious API calls), set breakpoints at those instructions, and then step into them to inspect arguments, return values, and side effects. Typical targets for breakpoints in droppers include `InternetOpen[AW]`, `URLDownloadToFile[AW]`, `CreateProcess`, `DeleteFile`, and functions that construct file paths or change persistence. This focused approach helps you get to the meaningful behavior quickly without stepping through every low-level instruction.
+
+
+## The Offensive Potential of HTML
+
+HTAs are commonly used as the payload of phishing attacks. 
+
+![hta](assets/img/HTA.png)
+
+It is no secret that HTML can be weaponized. Every time you visit a website, your web browser downloads and renders the code that is served out by that website. Your browser is really just an interpreter for the technologies that power the web: HTML, CSS, and JavaScript.
+
+HTML provides the structure of the website. CSS applies color, fonts, presentation, and layouts of the website. And JavaScript can dynamically control behavior of elements of the website.
+
+It’s that last one that we need to watch out for.
+JavaScript Is Dangerous
+
+You may be familiar with the classic Cross-Site Scripting test that pops an alert box by injecting the `<script> block into an HTML page. If you’ve seen this test before, you may have wondered “what is actually going on when this happens?”`
+
+![cros](assets/img/cross.png)
+
+## JavaScript in HTML — a short demo
+
+HTML pages can define the `<script>` tag to include code that can run different scripting languages. In most cases, the language is JavaScript. JavaScript can execute code within the browser to move components around on the page, change colors and fonts, pop that alert box, and do many other functions. Think of JavaScript as the programmatic engine of HTML.
+
+The W3Schools demo for JavaScript’s `alert()` box method demonstrates this well.
+
+Try saving this code to `index.html` and running it locally by opening it in a web browser:
+
+```html
+<!DOCTYPE html>
+<html>
+  <body>
+
+    <h1>The Window Object</h1>
+    <h2>The alert() Method</h2>
+
+    <p>Click the button to display an alert box.</p>
+
+    <button onclick="myFunction()">Try it</button>
+
+    <script>
+      function myFunction() {
+        alert("Hello! I am an alert box!");
+      }
+    </script>
+
+  </body>
+</html>
+```
+
+Security note: running local HTML with JavaScript is safe for simple demos, but real-world web pages can include external scripts, track users, and attempt to exploit browser vulnerabilities. Never run untrusted HTML/JS in an environment with sensitive data or elevated privileges.
+ 
+### Takeaway
+
+The takeaway here is that JavaScript executes code within the browser. But when JavaScript executes within a web browser, the code execution is confined to the web browser itself. That is to say, the code runs in the context of the browser, manipulates the document model of the web page, and can manipulate cookies, but can’t reach the operating system of the host unless there is some kind of browser-based code execution vulnerability.
+
+When used in an offensive capacity, JavaScript can perform activities like hooking the client’s browser (see the `BeEF Framework` for an example) and downloading files via `HTML Smuggling`. The offensive potential of JavaScript is apparent, but if it’s usually limited to the browser of the victim, then that doesn’t sound so bad, right?
+
+
+### Enter: HTML Applications (HTA)
+
+Imagine that a developer needs to design a compact, portable HTML site that can be easily sent to anyone who needs it. Maybe it’s a company survey. Maybe it’s a presentation of some sort. The developer can create an HTML Application (HTA) file for this purpose.
+
+HTAs are Windows-executable, packaged HTML files that run HTML, CSS, and Windows native scripting languages from a single file outside of the context of the web browser. The last part of that sentence is the really scary thing here: HTAs do not run in the context of the Windows web browser, but instead run as a trusted application on the operating system.
+
+An HTML Application is not much different from a normal HTML page in terms of construction. In fact, you can use the exact same code from an HTML page to make an HTA. That small change in packaging — running as an executable with wider privileges — is what makes HTAs attractive to attackers and dangerous for defenders.
+
+Security note: treat HTA files like executables. Do not open HTAs from untrusted sources, and block or inspect them in email and file-transfer controls where possible.
+
+![box](assets/img/box.png)
