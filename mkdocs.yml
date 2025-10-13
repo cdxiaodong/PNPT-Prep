@@ -27,9 +27,11 @@ nav:
             - Wiz CTF:
                - breaking the barriers.md
                - needle in a Haystack.md
+            - Caldera:
+                - setup_caldera.md
     - OpSec:
         - OpSec.md
-        - Critical CVE.md
+ 
 
 theme:
     name: material
