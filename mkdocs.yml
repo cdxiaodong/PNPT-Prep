@@ -27,6 +27,7 @@ nav:
             - Wiz CTF:
                - breaking the barriers.md
                - needle in a Haystack.md
+               - game_of_pods.md
             - Caldera:
                 - setup_caldera.md
     - OpSec:
